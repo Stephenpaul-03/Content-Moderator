@@ -29,21 +29,23 @@ function Post({ post }) {
         <CardHeader>
           <Flex spacing="4">
             <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
-              <Avatar name={post.name} src={post.avatar} />
+              <Avatar name={post.name || "Unknown User"} src={post.avatar || ""} />
               <Box>
-                <Heading size="sm">{post.name}</Heading>
-                <Text>{post.role}</Text>
+                <Heading size="sm">{post.name || "Anonymous"}</Heading>
+                <Text>{post.role || "No Role"}</Text>
               </Box>
             </Flex>
-            <Button variant="outline" colorScheme="gray" aria-label="See menu">
+            <Button variant="outline" colorScheme="gray" aria-label="Follow">
               Follow
             </Button>
           </Flex>
         </CardHeader>
         <Divider color="gray.300" />
         <CardBody>
-          <Text>{post.text}</Text>
+          {/* Ensure post text is rendered properly */}
+          <Text>{post.text || "No description provided."}</Text>
         </CardBody>
+        {/* Conditionally render the image if available */}
         {post.image && (
           <Image
             px={2}

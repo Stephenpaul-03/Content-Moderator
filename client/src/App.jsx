@@ -47,13 +47,13 @@ function App() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/posts");
-        setPosts(response.data);
+        const response = await axios.get("http://localhost:3000/api/posts");
+        setPosts(response.data.posts || []); 
       } catch (error) {
         console.error("Error fetching posts:", error);
       }
     };
-
+  
     fetchPosts();
   }, []);
 
@@ -78,20 +78,16 @@ function App() {
 
   const handlePost = async (newPost) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/posts",
-        newPost,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const postResponse = response.data;
+      const response = await axios.post("http://localhost:3000/api/posts", newPost, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const postResponse = response.data.post;  // Get the post data from the response
       console.log("Post submitted successfully:", postResponse);
-
-      // Update the posts state
-      setPosts((prevPosts) => [postResponse, ...prevPosts]); // Add the new post to the beginning
+  
+      // Add the new post to the beginning of the posts list
+      setPosts((prevPosts) => [postResponse, ...prevPosts]); // This updates the posts list
     } catch (error) {
       console.error("Error submitting post:", error);
     } finally {
@@ -99,7 +95,7 @@ function App() {
       onClose();
     }
   };
-
+  
   const handleLocationSelect = (location) => {
     setSelectedLocation(location);
   };

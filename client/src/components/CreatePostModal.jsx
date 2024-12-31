@@ -36,7 +36,6 @@ function CreatePostModal({ isOpen, onClose, handlePost, selectedCategories, setS
   const [name, setName] = useState('Your Name'); 
   const [role, setRole] = useState('Your Role'); 
   const [avatar, setAvatar] = useState(''); 
-  console.log("handlePost in CreatePostModal:", handlePost);
 
 
   const toggleCategories = (category) => {
