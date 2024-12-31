@@ -1,7 +1,6 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-
-// Import Swiper styles
+import { Autoplay} from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -16,16 +15,15 @@ const images = [
 
 const ImageCarousel = () => {
   return (
-    <div style={{ width: "100%", paddingLeft:"10px", paddingRight:"10px" }}>
+    <div style={{ width: "100%", paddingLeft: "10px", paddingRight: "10px" }}>
       <Center>
         <Swiper
-          spaceBetween={10}
-          slidesPerView={1}
-          loop={true}
-          autoplay={{
-            delay: 2500,
-            disableOnInteraction: false,
-          }}
+            modules={[Autoplay]}
+            autoplay={{ delay: 3000, disableOnInteraction: false }}
+            spaceBetween={0}
+            slidesPerView={1}
+            grabCursor={true}
+            loop
         >
           {images.map((image, index) => (
             <SwiperSlide key={index}>
