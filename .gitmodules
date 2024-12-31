@@ -1,0 +1,3 @@
+[submodule "kynscraper"]
+	path = kynscraper
+	url = https://github.com/wisebreadloaf/kynscraper
