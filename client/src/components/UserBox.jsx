@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Avatar,
   Heading,
@@ -12,14 +12,9 @@ import {
   CardBody,
 } from "@chakra-ui/react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper";
 import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
 
-// UserBox Component to display the post data
 function UserBox({ post }) {
-  // Checking if the post contains necessary data
   if (
     !post ||
     !post.avatars ||
@@ -49,7 +44,7 @@ function UserBox({ post }) {
           </Center>
         </CardBody>
       </Card>
-      <Divider color="gray.500" py={3} />
+      <Divider color="gray 500" py={3} />
       <Card marginTop="20px" variant="filled">
         <CardHeader>
           <Heading size="md" textAlign="center">
@@ -70,7 +65,7 @@ function UserBox({ post }) {
                 }}
               >
                 <SwiperSlide>
-                  <Card maxW="sm" variant="outline">
+                  <Card maxW="sm" variant="filled">
                     <CardBody>
                       <Image
                         src={post.imageUrl}
@@ -84,7 +79,7 @@ function UserBox({ post }) {
                   </Card>
                 </SwiperSlide>
                 <SwiperSlide>
-                  <Card maxW="sm" variant='outline'>
+                  <Card maxW="sm" variant="filled">
                     <CardBody>
                       <Image
                         src={post.imageUrl}
@@ -134,16 +129,17 @@ function App() {
       ],
       exclusiveTitle: "Exclusives",
       imageUrl:
-        "https://via.placeholder.com/800x400?text=Image+1",
-      imageAlt: "Temporary Image",
-      productName: "Post Title",
+        "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
+      imageAlt: "Green double couch with wooden legs",
+      productName: "Living room Sofa",
     },
   ];
 
   return (
     <div>
-      {/* Render the first post */}
-      {posts.length > 0 && <UserBox key={posts[0].id} post={posts[0]} />}
+      {posts.map((post) => (
+        <UserBox key={post.id} post={post} />
+      ))}
     </div>
   );
 }
