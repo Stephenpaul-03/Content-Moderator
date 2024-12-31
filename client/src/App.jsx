@@ -314,17 +314,17 @@ function App() {
           width="100%"
           style={{ gridTemplateColumns: "1fr 2fr 1fr" }}
         >
-          <Box maxWidth="350px" bg="#fff">
+          <Box maxWidth="350px">
             <UserBox />
           </Box>
-          <Box maxWidth="700px" bg="#fff">
+          <Box maxWidth="700px">
             <ImageCarousel />
             <Divider marginTop={2} marginBottom={2} />
             {posts.map((post) => (
               <Post key={post.id} post={post} />
             ))}
           </Box>
-          <Box maxWidth="400px" bg="#fff"></Box>
+          <Box maxWidth="400px"></Box>
         </SimpleGrid>
       </Box>
     </Flex>
