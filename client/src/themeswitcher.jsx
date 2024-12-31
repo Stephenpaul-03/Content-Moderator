@@ -1,12 +1,12 @@
 import { Button, useColorMode } from '@chakra-ui/react';
-import { MoonIcon, SunIcon } from '@chakra-ui/icons'
+import { Sun, Moon } from 'lucide-react';
 
 function ThemeSwitcher() {
   const { colorMode, toggleColorMode } = useColorMode();
 
   return (
-    <Button onClick={toggleColorMode} mt={0}>
-       {colorMode === 'light' ? <MoonIcon/> : <SunIcon/>}
+    <Button onClick={toggleColorMode} mt={0} variant='ghost' marginTop={2}>
+       {colorMode === 'light' ? <Moon/> : <Sun/>}
     </Button>
   );
 }

@@ -18,27 +18,29 @@ import {
   Popover,
   PopoverTrigger,
   PopoverContent,
+  PopoverHeader,
   PopoverBody,
+  PopoverFooter,
   PopoverArrow,
+  PopoverCloseButton,
+  PopoverAnchor,
   SimpleGrid,
 } from "@chakra-ui/react";
-import {
-  PhoneIcon,
-  AddIcon,
-  WarningIcon,
-  UnlockIcon,
-  ChevronDownIcon,
-} from "@chakra-ui/icons";
+
+import { House, Film, Tv, MonitorPlay, Bell, ChevronDown } from 'lucide-react';
+
 import ThemeSwitcher from "./themeswitcher";
 import CreatePostModal from "./components/CreatePostModal";
 import Post from "./components/Post";
 import UserBox from "./components/UserBox";
+import ImageCarousel from "./components/ImageCarousel";
 
 function App() {
   const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState("Locations"); // Add state for location
 
   const resetForm = () => {
     setSelectedOptions([]);
@@ -75,6 +77,11 @@ function App() {
     onClose();
   };
 
+  // Handle location selection
+  const handleLocationSelect = (location) => {
+    setSelectedLocation(location);
+  };
+
   return (
     <Flex minHeight="100vh" minWidth="100vw" direction="column" px={10}>
       <Box
@@ -83,6 +90,7 @@ function App() {
         bg={colorMode === "light" ? "white" : "black"}
         color={colorMode === "light" ? "black" : "white"}
         p={4}
+        maxHeight="80px"
         position="fixed"
         top="0"
         left="0"
@@ -93,7 +101,7 @@ function App() {
             <Avatar
               size="sm"
               name="Dan Abrahmov"
-              src="https://bit.ly/dan-abramov"
+              src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp"
             />
             <Divider
               orientation="vertical"
@@ -103,17 +111,17 @@ function App() {
             <Menu>
               <MenuButton
                 as={Button}
-                rightIcon={<ChevronDownIcon />}
+                rightIcon={<ChevronDown />}
                 width="225px"
                 textAlign="start"
               >
-                Locations
+                {selectedLocation} {/* Display the selected location */}
               </MenuButton>
               <MenuList width="200px">
-                <MenuItem>Anna Nagar</MenuItem>
-                <MenuItem>T Nagar</MenuItem>
-                <MenuItem>Avadi</MenuItem>
-                <MenuItem>Chengalpattu</MenuItem>
+                <MenuItem onClick={() => handleLocationSelect("Anna Nagar")}>Anna Nagar</MenuItem>
+                <MenuItem onClick={() => handleLocationSelect("T Nagar")}>T Nagar</MenuItem>
+                <MenuItem onClick={() => handleLocationSelect("Avadi")}>Avadi</MenuItem>
+                <MenuItem onClick={() => handleLocationSelect("Chengalpattu")}>Chengalpattu</MenuItem>
               </MenuList>
             </Menu>
           </HStack>
@@ -121,37 +129,47 @@ function App() {
             <HStack spacing={10}>
               <Button
                 variant="link"
-                color={colorMode === "light" ? "black" : "white"}
+                color={colorMode === "light" ? "black" : "light"}
+                _hover={{ color: "red.600" }}
+                _active={{ color: "red.700" }}
               >
                 <VStack spacing={2}>
-                  <PhoneIcon />
-                  <Text fontSize="sm">Call</Text>
+                  <House />
+                  <Text fontSize="sm">Home</Text>
                 </VStack>
               </Button>
               <Button
                 variant="link"
-                color={colorMode === "light" ? "black" : "white"}
+                color={colorMode === "light" ? "black" : "light"}
+                _hover={{ color: "red.600" }}
+                _active={{ color: "red.700" }}
               >
                 <VStack spacing={1}>
-                  <AddIcon />
-                  <Text fontSize="sm">Add</Text>
+                  <Tv />
+                  <Text fontSize="sm">Live</Text>
                 </VStack>
               </Button>
               <Button
                 variant="link"
-                color={colorMode === "light" ? "black" : "white"}
+                color={colorMode === "light" ? "black" : "light"}
+                _hover={{ color: "red.600" }}
+                _active={{ color: "red.700" }}
               >
                 <VStack spacing={1}>
-                  <WarningIcon />
-                  <Text fontSize="sm">Warn</Text>
+                  <Film />
+                  <Text fontSize="sm">Videos</Text>
                 </VStack>
               </Button>
               <Button
                 variant="link"
-                color={colorMode === "light" ? "black" : "white"}
+                outline="none"
+                color={colorMode === "light" ? "black" : "light"}
+                _hover={{ color: "red.600" }}
+                _active={{ color: "red.700" }}
               >
                 <VStack spacing={1}>
-                  <UnlockIcon /> <Text fontSize="sm">Unlock</Text>
+                  <MonitorPlay />
+                  <Text fontSize="sm">Klips</Text>
                 </VStack>
               </Button>
             </HStack>
@@ -165,11 +183,42 @@ function App() {
             />
             <Popover>
               <PopoverTrigger>
-                <PhoneIcon />
+                <Bell />
               </PopoverTrigger>
-              <PopoverContent width="200px">
+              <PopoverContent width="200px" marginTop={6}>
                 <PopoverArrow />
                 <ThemeSwitcher />
+                <Divider py={1} />
+                <PopoverBody>
+                  <Button width="100%" variant="ghost" size="md">
+                    About KYN
+                  </Button>
+                </PopoverBody>
+                <PopoverBody>
+                  <Button width="100%" variant="ghost" size="md">
+                    Privacy Policy
+                  </Button>
+                </PopoverBody>
+                <PopoverBody>
+                  <Button width="100%" variant="ghost" size="md">
+                    Terms and Conditions
+                  </Button>
+                </PopoverBody>
+                <PopoverBody>
+                  <Button width="100%" variant="ghost" size="md">
+                    Community Guidelines
+                  </Button>
+                </PopoverBody>
+                <PopoverBody>
+                  <Button width="100%" variant="ghost" size="md">
+                    Grievance
+                  </Button>
+                </PopoverBody>
+                <PopoverBody>
+                  <Button width="100%" variant="ghost" size="md">
+                    List your Event
+                  </Button>
+                </PopoverBody>
               </PopoverContent>
             </Popover>
             <Divider
@@ -182,12 +231,22 @@ function App() {
                 <Avatar
                   size="sm"
                   name="Dan Abrahmov"
-                  src="https://bit.ly/dan-abramov"
+                  src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp"
                 />
               </PopoverTrigger>
-              <PopoverContent width="200px">
+              <PopoverContent width="200px" marginTop={6}>
                 <PopoverArrow />
-                <PopoverBody>Avatar Options Here</PopoverBody>
+                <PopoverBody>
+                  <Button width="100%" variant="ghost" size="md">
+                    Profile
+                  </Button>
+                </PopoverBody>
+                <Divider />
+                <PopoverBody>
+                  <Button width="100%" variant="ghost" size="md" color="red.300">
+                    Log Out
+                  </Button>
+                </PopoverBody>
               </PopoverContent>
             </Popover>
           </HStack>
@@ -218,17 +277,17 @@ function App() {
           spacing={10}
           margin="0"
           width="100%"
-          style={{ gridTemplateColumns: "1fr 2fr 1fr" }} 
+          style={{ gridTemplateColumns: "1fr 2fr 1fr" }}
         >
-          <Box maxWidth="400px">
+          <Box maxWidth="350px"  bg='#fff'>
             <UserBox />
           </Box>
-          <Box maxWidth='800px'>
+          <Box maxWidth="700px" bg='#fff'>
+            <ImageCarousel/>
+            <Divider marginTop={2} marginBottom={2}/>
             <Post />
           </Box>
-          <Box maxWidth="400px">
-            <UserBox/>
-          </Box>
+          <Box maxWidth="400px"  bg='#fff'></Box>
         </SimpleGrid>
       </Box>
     </Flex>

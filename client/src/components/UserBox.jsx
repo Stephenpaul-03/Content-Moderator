@@ -1,57 +1,98 @@
 import React, { useState } from "react";
 import {
-  Box,
-  Button,
-  Flex,
   Avatar,
   Heading,
-  IconButton,
   Text,
   Image,
   Divider,
   AvatarGroup,
+  Center,
+  Card,
+  CardHeader,
+  CardBody,
 } from "@chakra-ui/react";
-import { PhoneIcon } from "@chakra-ui/icons";
-import { Card, CardHeader, CardBody, CardFooter } from "@chakra-ui/react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
 
-// Post component
 function UserBox({ post }) {
-  console.log(post); // Log post data to check if it exists
-
-  // Check if post exists and contains the necessary data
-  if (!post || !post.avatars || !post.exclusiveTitle || !post.imageUrl || !post.productName) {
+  if (
+    !post ||
+    !post.avatars ||
+    !post.exclusiveTitle ||
+    !post.imageUrl ||
+    !post.productName
+  ) {
     return <Text>No post data available</Text>;
   }
 
   return (
     <>
-      <Card>
+      <Card variant="filled">
         <CardHeader>
-          <Heading size="md">Follow your KYNs</Heading>
+          <Heading size="md" textAlign="center">
+            Follow your KYNs
+          </Heading>
         </CardHeader>
-
+        <Divider color="gray.300" />
         <CardBody>
-          <AvatarGroup size="md" max={3} alignSelf='center'>
-            {post.avatars.map((avatar, index) => (
-              <Avatar key={index} name={avatar.name} src={avatar.src} />
-            ))}
-          </AvatarGroup>
+          <Center>
+            <AvatarGroup size="md" max={3} alignSelf="center">
+              {post.avatars.map((avatar, index) => (
+                <Avatar key={index} name={avatar.name} src={avatar.src} />
+              ))}
+            </AvatarGroup>
+          </Center>
         </CardBody>
       </Card>
-      <Divider />
-      <Card marginTop='20px'>
+      <Divider color="gray 500" py={3} />
+      <Card marginTop="20px" variant="filled">
         <CardHeader>
-          <Heading size="md">{post.exclusiveTitle}</Heading>
+          <Heading size="md" textAlign="center">
+            {post.exclusiveTitle}
+          </Heading>
         </CardHeader>
+        <Divider color="gray.300" />
         <CardBody>
           <Card maxW="sm">
             <CardBody>
-              <Image
-                src={post.imageUrl}
-                alt={post.imageAlt}
-                borderRadius="lg"
-              />
-              <Heading size="md">{post.productName}</Heading>
+              <Swiper
+                spaceBetween={10}
+                slidesPerView={1}
+                loop={true}
+                autoplay={{
+                  delay: 3000,
+                  disableOnInteraction: false,
+                }}
+              >
+                <SwiperSlide>
+                  <Card maxW="sm" variant="filled">
+                    <CardBody>
+                      <Image
+                        src={post.imageUrl}
+                        alt={post.imageAlt}
+                        borderRadius="lg"
+                      />
+                      <Heading size="md" marginTop={5}>
+                        {post.productName}
+                      </Heading>
+                    </CardBody>
+                  </Card>
+                </SwiperSlide>
+                <SwiperSlide>
+                  <Card maxW="sm" variant="filled">
+                    <CardBody>
+                      <Image
+                        src={post.imageUrl}
+                        alt={post.imageAlt}
+                        borderRadius="lg"
+                      />
+                      <Heading size="md" marginTop={5}>
+                        {post.productName}
+                      </Heading>
+                    </CardBody>
+                  </Card>
+                </SwiperSlide>
+              </Swiper>
             </CardBody>
           </Card>
         </CardBody>
@@ -60,18 +101,31 @@ function UserBox({ post }) {
   );
 }
 
-// Main App component
 function App() {
-  // Define posts array
   const posts = [
     {
       id: 1,
       avatars: [
-        { name: "Ryan Florence", src: "https://bit.ly/ryan-florence" },
-        { name: "Segun Adebayo", src: "https://bit.ly/sage-adebayo" },
-        { name: "Kent Dodds", src: "https://bit.ly/kent-c-dodds" },
-        { name: "Prosper Otemuyiwa", src: "https://bit.ly/prosper-baba" },
-        { name: "Christian Nwamba", src: "https://bit.ly/code-beast" },
+        {
+          name: "Ryan Florence",
+          src: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp",
+        },
+        {
+          name: "Segun Adebayo",
+          src: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp",
+        },
+        {
+          name: "Kent Dodds",
+          src: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp",
+        },
+        {
+          name: "Prosper Otemuyiwa",
+          src: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp",
+        },
+        {
+          name: "Christian Nwamba",
+          src: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp",
+        },
       ],
       exclusiveTitle: "Exclusives",
       imageUrl:
@@ -84,7 +138,7 @@ function App() {
   return (
     <div>
       {posts.map((post) => (
-        <UserBox key={post.id} post={post} /> // Make sure to pass the correct prop 'post'
+        <UserBox key={post.id} post={post} />
       ))}
     </div>
   );

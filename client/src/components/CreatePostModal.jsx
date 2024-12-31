@@ -72,10 +72,10 @@ function CreatePostModal({
       >
         <ModalOverlay />
         <ModalContent width="400px" minHeight="600px" maxHeight="90vh" overflow="auto" >
-          <ModalHeader>Create New Content</ModalHeader>
+          <ModalHeader px={10}>Create New Content</ModalHeader>
           <ModalCloseButton />
-          <Tabs size="md" variant="enclosed" align="center">
-            <TabList>
+          <Tabs size="md" variant='line' align='start'>
+            <TabList px={10} gap={2}>
               <Tab>Posts</Tab>
               <Tab>Klips</Tab>
             </TabList>
