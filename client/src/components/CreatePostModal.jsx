@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { PostService } from '../services/api';
 import {
   Box,
   Button,
@@ -38,6 +39,31 @@ function CreatePostModal({
 
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [file, setFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const postData = {
+        title: selectedCategories.join(', '), // Using categories as title
+        description: document.getElementById("post-text").value,
+        location: localStorage.getItem('selectedLocation') || 'Default Location',
+        images: file ? [file] : [], // If it's an image
+        videos: file && file.type.startsWith('video/') ? [file] : [] // If it's a video
+      };
+
+      await PostService.createPost(postData);
+      onClose();
+      // You might want to refresh the feed here
+    } catch (err) {
+      setError(err.message || 'Failed to create post');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const toggleCategories = (Category) => {
     if (selectedCategories.includes(Category)) {
@@ -229,10 +255,17 @@ function CreatePostModal({
             </VStack>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" onClick={handleCategoryModalClose}>
-              Confirm
+            {error && <Text color="red.500">{error}</Text>}
+            <Button 
+              colorScheme="blue" 
+              mr={3} 
+              onClick={handleSubmit}
+              isLoading={isLoading}
+              loadingText="Posting..."
+            >
+              Post
             </Button>
-          </ModalFooter>
+          </ModalFooter>        
         </ModalContent>
       </Modal>
     </>

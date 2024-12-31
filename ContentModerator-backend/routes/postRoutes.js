@@ -5,6 +5,8 @@ const { db } = require('../config/firebase.js');
 const { authenticateUser } = require('../middlewares/auth.js');
 const { validate } = require('../middlewares/validation.js');
 const { AppError } = require('../middlewares/errorHandler.js');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -26,8 +28,12 @@ router.get('/feed', authenticateUser, async (req, res, next) => {
 
 // Create post
 router.post('/', 
-  authenticateUser, 
-  validate('createPost'),
+  authenticateUser,
+  upload.fields([
+    { name: 'images', maxCount: 10 },
+    { name: 'videos', maxCount: 5 }
+  ]),
+  validate('createPost'), 
   async (req, res, next) => {
     try {
       const { title, description, location, images, videos } = req.body;
