@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Box,
   Flex,
@@ -27,7 +28,7 @@ import {
   SimpleGrid,
 } from "@chakra-ui/react";
 
-import { House, Film, Tv, MonitorPlay, Bell, ChevronDown } from 'lucide-react';
+import { House, Film, Tv, MonitorPlay, Bell, ChevronDown } from "lucide-react";
 
 import ThemeSwitcher from "./themeswitcher";
 import CreatePostModal from "./components/CreatePostModal";
@@ -40,7 +41,21 @@ function App() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedLocation, setSelectedLocation] = useState("Locations"); // Add state for location
+  const [posts, setPosts] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState("Locations");
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/posts");
+        setPosts(response.data);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   const resetForm = () => {
     setSelectedOptions([]);
@@ -61,23 +76,30 @@ function App() {
     }
   };
 
-  const handlePost = () => {
-    const postData = {
-      selectedCategory: selectedCategories,
-      selectedOptions: selectedOptions,
-      postContent: {
-        text: document.getElementById("post-text").value,
-        file: document.getElementById("post-file").files[0],
-      },
-    };
+  const handlePost = async (newPost) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/posts",
+        newPost,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const postResponse = response.data;
+      console.log("Post submitted successfully:", postResponse);
 
-    console.log("Post Data: ", JSON.stringify(postData, null, 2));
-
-    resetForm();
-    onClose();
+      // Update the posts state
+      setPosts((prevPosts) => [postResponse, ...prevPosts]); // Add the new post to the beginning
+    } catch (error) {
+      console.error("Error submitting post:", error);
+    } finally {
+      resetForm();
+      onClose();
+    }
   };
 
-  // Handle location selection
   const handleLocationSelect = (location) => {
     setSelectedLocation(location);
   };
@@ -118,10 +140,18 @@ function App() {
                 {selectedLocation} {/* Display the selected location */}
               </MenuButton>
               <MenuList width="200px">
-                <MenuItem onClick={() => handleLocationSelect("Anna Nagar")}>Anna Nagar</MenuItem>
-                <MenuItem onClick={() => handleLocationSelect("T Nagar")}>T Nagar</MenuItem>
-                <MenuItem onClick={() => handleLocationSelect("Avadi")}>Avadi</MenuItem>
-                <MenuItem onClick={() => handleLocationSelect("Chengalpattu")}>Chengalpattu</MenuItem>
+                <MenuItem onClick={() => handleLocationSelect("Anna Nagar")}>
+                  Anna Nagar
+                </MenuItem>
+                <MenuItem onClick={() => handleLocationSelect("T Nagar")}>
+                  T Nagar
+                </MenuItem>
+                <MenuItem onClick={() => handleLocationSelect("Avadi")}>
+                  Avadi
+                </MenuItem>
+                <MenuItem onClick={() => handleLocationSelect("Chengalpattu")}>
+                  Chengalpattu
+                </MenuItem>
               </MenuList>
             </Menu>
           </HStack>
@@ -243,7 +273,12 @@ function App() {
                 </PopoverBody>
                 <Divider />
                 <PopoverBody>
-                  <Button width="100%" variant="ghost" size="md" color="red.300">
+                  <Button
+                    width="100%"
+                    variant="ghost"
+                    size="md"
+                    color="red.300"
+                  >
                     Log Out
                   </Button>
                 </PopoverBody>
@@ -258,7 +293,7 @@ function App() {
         onClose={handleModalCloseWithPrompt}
         selectedCategories={selectedCategories}
         setSelectedCategories={setSelectedCategories}
-        handlePost={handlePost}
+        handlePost={handlePost} // Ensure this is passed
       />
 
       {/* Main content goes here */}
@@ -279,15 +314,17 @@ function App() {
           width="100%"
           style={{ gridTemplateColumns: "1fr 2fr 1fr" }}
         >
-          <Box maxWidth="350px"  bg='#fff'>
+          <Box maxWidth="350px" bg="#fff">
             <UserBox />
           </Box>
-          <Box maxWidth="700px" bg='#fff'>
-            <ImageCarousel/>
-            <Divider marginTop={2} marginBottom={2}/>
-            <Post />
+          <Box maxWidth="700px" bg="#fff">
+            <ImageCarousel />
+            <Divider marginTop={2} marginBottom={2} />
+            {posts.map((post) => (
+              <Post key={post.id} post={post} />
+            ))}
           </Box>
-          <Box maxWidth="400px"  bg='#fff'></Box>
+          <Box maxWidth="400px" bg="#fff"></Box>
         </SimpleGrid>
       </Box>
     </Flex>
