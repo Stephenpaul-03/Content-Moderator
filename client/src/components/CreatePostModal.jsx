@@ -161,9 +161,15 @@ function CreatePostModal({
                   <Spacer />
                 </ModalBody>
                 <ModalFooter>
-                  <Button colorScheme="blue" mr={3} onClick={handlePost}>
-                    Post
-                  </Button>
+                <Button 
+              colorScheme="blue" 
+              mr={3} 
+              onClick={handleSubmit}
+              isLoading={isLoading}
+              loadingText="Posting..."
+            >
+              Post
+            </Button>
                 </ModalFooter>
               </TabPanel>
 
@@ -256,15 +262,6 @@ function CreatePostModal({
           </ModalBody>
           <ModalFooter>
             {error && <Text color="red.500">{error}</Text>}
-            <Button 
-              colorScheme="blue" 
-              mr={3} 
-              onClick={handleSubmit}
-              isLoading={isLoading}
-              loadingText="Posting..."
-            >
-              Post
-            </Button>
           </ModalFooter>        
         </ModalContent>
       </Modal>

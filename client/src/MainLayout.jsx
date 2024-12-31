@@ -27,15 +27,20 @@ import {
   SimpleGrid,
 } from "@chakra-ui/react";
 
-import { House, Film, Tv, MonitorPlay, Bell, ChevronDown } from 'lucide-react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { House, Film, Tv, MonitorPlay, Bell, ChevronDown } from "lucide-react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import ThemeSwitcher from "./themeswitcher";
 import CreatePostModal from "./components/CreatePostModal";
 import Post from "./components/Post";
 import UserBox from "./components/UserBox";
 import ImageCarousel from "./components/ImageCarousel";
 import Login from "./components/Login.jsx";
-import { AuthProvider, PrivateRoute } from './authprovider.jsx';
+import { AuthProvider, PrivateRoute } from "./authprovider.jsx";
 
 const MainLayout = () => {
   const { colorMode } = useColorMode();
@@ -63,7 +68,7 @@ const MainLayout = () => {
     }
   };
 
-  const handlePost = () => {
+  const handlePost = async () => {
     const postData = {
       selectedCategory: selectedCategories,
       selectedOptions: selectedOptions,
@@ -73,10 +78,41 @@ const MainLayout = () => {
       },
     };
 
-    console.log("Post Data: ", JSON.stringify(postData, null, 2));
+    try {
+      const formData = new FormData();
+      formData.append(
+        "selectedCategory",
+        JSON.stringify(postData.selectedCategory)
+      );
+      formData.append(
+        "selectedOptions",
+        JSON.stringify(postData.selectedOptions)
+      );
+      formData.append("text", postData.postContent.text);
+      if (postData.postContent.file) {
+        formData.append("file", postData.postContent.file);
+      }
 
-    resetForm();
-    onClose();
+      const response = await axios.post(
+        "http://localhost:3000/api/posts",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      const postResponse = response.data.post; 
+      console.log("Post submitted successfully:", postResponse);
+
+      setPosts((prevPosts) => [postResponse, ...prevPosts]);
+    } catch (error) {
+      console.error("Error submitting post:", error);
+    } finally {
+      resetForm();
+      onClose();
+    }
   };
 
   // Handle location selection
@@ -120,10 +156,18 @@ const MainLayout = () => {
                 {selectedLocation} {/* Display the selected location */}
               </MenuButton>
               <MenuList width="200px">
-                <MenuItem onClick={() => handleLocationSelect("Anna Nagar")}>Anna Nagar</MenuItem>
-                <MenuItem onClick={() => handleLocationSelect("T Nagar")}>T Nagar</MenuItem>
-                <MenuItem onClick={() => handleLocationSelect("Avadi")}>Avadi</MenuItem>
-                <MenuItem onClick={() => handleLocationSelect("Chengalpattu")}>Chengalpattu</MenuItem>
+                <MenuItem onClick={() => handleLocationSelect("Anna Nagar")}>
+                  Anna Nagar
+                </MenuItem>
+                <MenuItem onClick={() => handleLocationSelect("T Nagar")}>
+                  T Nagar
+                </MenuItem>
+                <MenuItem onClick={() => handleLocationSelect("Avadi")}>
+                  Avadi
+                </MenuItem>
+                <MenuItem onClick={() => handleLocationSelect("Chengalpattu")}>
+                  Chengalpattu
+                </MenuItem>
               </MenuList>
             </Menu>
           </HStack>
@@ -245,7 +289,12 @@ const MainLayout = () => {
                 </PopoverBody>
                 <Divider />
                 <PopoverBody>
-                  <Button width="100%" variant="ghost" size="md" color="red.300">
+                  <Button
+                    width="100%"
+                    variant="ghost"
+                    size="md"
+                    color="red.300"
+                  >
                     Log Out
                   </Button>
                 </PopoverBody>
@@ -281,19 +330,19 @@ const MainLayout = () => {
           width="100%"
           style={{ gridTemplateColumns: "1fr 2fr 1fr" }}
         >
-          <Box maxWidth="350px"  bg='#fff'>
+          <Box maxWidth="350px" bg="#fff">
             <UserBox />
           </Box>
-          <Box maxWidth="700px" bg='#fff'>
-            <ImageCarousel/>
-            <Divider marginTop={2} marginBottom={2}/>
+          <Box maxWidth="700px" bg="#fff">
+            <ImageCarousel />
+            <Divider marginTop={2} marginBottom={2} />
             <Post />
           </Box>
-          <Box maxWidth="400px"  bg='#fff'></Box>
+          <Box maxWidth="400px" bg="#fff"></Box>
         </SimpleGrid>
       </Box>
     </Flex>
   );
-}
+};
 
 export default MainLayout;
