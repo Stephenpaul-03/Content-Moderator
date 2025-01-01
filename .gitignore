@@ -2,3 +2,4 @@
 /server/node_modules/
 /ContentModerator-backend/node_modules/
 /ContentModerator-backend/uploads/
+/ContentModerator-backend/firebase-service-account.json/

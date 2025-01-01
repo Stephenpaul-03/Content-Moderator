@@ -18,6 +18,40 @@ The **Content Moderation** system helps in detecting and filtering inappropriate
 
 ## Instructions to Run
 
+### Important: Need firebase login and private key:
+
+- Login to firebase
+- Create a new project
+- Under Build, Add a *Firestore Database*
+- After creating a firestore database, click on Rules tab and add the below code 
+
+```bash
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    match /posts/{postId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+    
+    match /likes/{likeId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+  }
+}
+```
+- Then, again navigate to Build and add *Authentication*, select email password as the mode of authentication
+- Now, In the top left corner click on the cogwheel near project overview and go to project settings
+- Navigate to service account keys and click on generate private key which will download a json file
+- Rename the file to *firebase-service-account.json* and copy the file into Content-Moderator/ContentModerator-backend.
+
 Follow the steps below to get the Content Moderator system up and running locally on your machine.
 
 ### Clone the Repository
