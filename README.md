@@ -52,6 +52,25 @@ service cloud.firestore {
 - Navigate to service account keys and click on generate private key which will download a json file
 - Rename the file to *firebase-service-account.json* and copy the file into Content-Moderator/ContentModerator-backend.
 
+- Similarly go to project settings and scroll down to create a new web app . Then get the sdk configuration in it similar to the below content
+
+```bash
+const firebaseConfig = {
+  apiKey: "",
+  authDomain: "",
+  databaseURL: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: "",
+  measurementId: ""
+};
+```
+
+- Modify the /Content-Moderator/ContentModerator-backend/firebaseConfig.js to your sdk and similarly modify the content of /Content-Moderator/src/client/firebase.js to match your sdk
+
+
+
 Follow the steps below to get the Content Moderator system up and running locally on your machine.
 
 ### Clone the Repository
