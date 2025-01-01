@@ -99,36 +99,19 @@ const AuthService = {
 };
 
 const PostService = {
+  
   createPost: async (postData) => {
     try {
-      const formData = new FormData();
-      
-      // Add text fields
-      formData.append('title', postData.title);
-      formData.append('description', postData.description || '');
-      formData.append('location', postData.location);
-      
-      // Add images
-      if (postData.images) {
-        postData.images.forEach((image) => {
-          formData.append('images', image);
-        });
-      }
-      
-      // Add videos
-      if (postData.videos) {
-        postData.videos.forEach((video) => {
-          formData.append('videos', video);
-        });
-      }
-      
-      const response = await api.post('/posts', formData, {
+      // Send the data directly as JSON since we're using base64 string
+      const response = await api.post('/posts', postData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'application/json'
         }
       });
+      
       return response.data;
     } catch (error) {
+      console.error('Post creation error:', error);
       throw error.response?.data || error.message;
     }
   },

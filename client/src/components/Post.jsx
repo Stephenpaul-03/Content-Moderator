@@ -76,14 +76,15 @@ function Post() {
             <Text>{post.description}</Text>
           </CardBody>
           {post.images && post.images.length > 0 && (
-            <Image
-              px={2}
-              paddingBottom={2}
-              objectFit="cover"
-              src={post.images[0]}
-              alt="Post image"
-            />
-          )}
+              <Image
+                px={2}
+                paddingBottom={2}
+                objectFit="cover"
+                src={post.images[0]} // This now contains a base64 string
+                alt="Post image"
+              />
+            )}          
+          
           <CardFooter
             justify="space-between"
             flexWrap="wrap"
@@ -116,38 +117,3 @@ function Post() {
 
 export default Post;
 
-//
-// function App() {
-//   const posts = [
-//     {
-//       id: 1,
-//       name: "Segun Adebayo",
-//       role: "Creator, Chakra UI",
-//       avatar: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp",
-//       text: "With Chakra UI, I wanted to sync the speed of development with the speed of design. I wanted the developer to be just as excited as the designer to create a screen.",
-//       image:
-//         "https://images.unsplash.com/photo-1531403009284-440f080d1e12?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
-//       altText: "Chakra UI",
-//     },
-//     {
-//       id: 2,
-//       name: "John Doe",
-//       role: "Frontend Developer",
-//       avatar: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp",
-//       text: "React is such a powerful tool for building modern web apps. It's easy to learn and highly efficient!",
-//       image:
-//         "https://images.unsplash.com/photo-1531403009284-440f080d1e12?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
-//       altText: "React JS",
-//     },
-//   ];
-//
-//   return (
-//     <div>
-//       {posts.map((post) => (
-//         <Post key={post.id} post={post} />
-//       ))}
-//     </div>
-//   );
-// }
-//
-// export default App;

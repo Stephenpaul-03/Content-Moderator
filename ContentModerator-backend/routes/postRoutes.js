@@ -7,6 +7,7 @@ const { validate } = require('../middlewares/validation.js');
 const { AppError } = require('../middlewares/errorHandler.js');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
+const fs = require('fs').promises;
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -17,7 +18,10 @@ if (!admin.apps.length) {
 
 router.get('/feed', authenticateUser, async (req, res, next) => {
   try {
-    const postsSnapshot = await db.collection('posts').limit(10).get();
+    const postsSnapshot = await db.collection('posts')
+      .orderBy('postedTime', 'desc')
+      .limit(10)
+      .get();
     const posts = postsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     res.json({ posts });
@@ -27,18 +31,24 @@ router.get('/feed', authenticateUser, async (req, res, next) => {
 });
 
 // Create post
-router.post('/', 
+router.post(
+  '/',
   authenticateUser,
-  upload.fields([
-    { name: 'images', maxCount: 10 },
-    { name: 'videos', maxCount: 5 }
-  ]),
-  validate('createPost'), 
+  validate('createPost'),
   async (req, res, next) => {
     try {
-      const { title, description, location, images, videos } = req.body;
+      const { title, description, location, images } = req.body;
       const userId = req.user.uid;
-      
+
+      if (!images || !images.length) {
+        throw new AppError('Image is required', 400);
+      }
+
+      // Validate base64 image
+      if (!images[0].startsWith('data:image/')) {
+        throw new AppError('Invalid image format', 400);
+      }
+
       const postData = {
         userId,
         title,
@@ -47,27 +57,30 @@ router.post('/',
         likes: 0,
         views: 0,
         location,
-        images: images || [],
-        videos: videos || [],
-        commentCount: 0
+        images, // Store the array of base64 strings
+        commentCount: 0,
       };
-      
+
       const postRef = await db.collection('posts').add(postData);
-      console.log('New Post ID:', postRef.id);
-      res.status(201).json({ 
-        message: 'Post created successfully', 
-        postId: postRef.id 
+
+      res.status(201).json({
+        message: 'Post created successfully',
+        postId: postRef.id,
+        post: {
+          id: postRef.id,
+          ...postData
+        }
       });
     } catch (error) {
       next(new AppError(error.message, 400));
     }
-});
+  }
+);
 
 // Get single post with comments
 router.get('/:postId', authenticateUser, async (req, res, next) => {
   try {
     const { postId } = req.params;
-    console.log('Fetching post with ID:', postId);
     const postDoc = await db.collection('posts').doc(postId).get();
     
     if (!postDoc.exists) {
