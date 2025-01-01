@@ -32,7 +32,9 @@ cd Content Moderation
 ### To run Frontend
 
 ```bash
+cd client
 npm i
+npm install axios firebase react-router-dom
 npm run dev
 ```
 
@@ -41,6 +43,7 @@ npm run dev
 ```bash
 cd ContentModerator-backend
 npm i
+npm install ws
 npm run dev
 ```
 
