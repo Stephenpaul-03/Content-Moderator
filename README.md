@@ -51,4 +51,16 @@ Register as a new user and log in using your credentials.
 Once logged in, you can add posts to the feed.
 The system will automatically check for explicit or harmful content, and if any is detected, the post will not be added to the database
  Content Moderator
- 
+
+
+## Content flagged as explicit or harmful content
+
+- Safe content Family-friendly, neutral, or harmless content 
+- Sexual content Explicit or suggestive sexual imagery or text
+- Hate speech content Content promoting hatred or discrimination
+- Violent content Depictions or descriptions of physical violence or harm
+- Harassment content Bullying, personal attacks, or threats.
+- Self-harm content  Glorification or depiction of self-harm or suicide
+- Minor-related inappropriate content Inappropriate or explicit content involving minors
+- Threatening content Threats of violence or harm toward individuals, groups, or entities
+
