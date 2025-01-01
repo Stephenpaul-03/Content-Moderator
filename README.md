@@ -25,7 +25,7 @@ Follow the steps below to get the Content Moderator system up and running locall
 Start by cloning the repository to your local machine using the following command and navigate to project repository
 
 ```bash
-git clone -b contentmoderation https://github.com/Stephenpaul-03/Content-Moderator.git
+git clone https://github.com/Stephenpaul-03/Content-Moderator.git
 cd Content Moderation
 ```
 
