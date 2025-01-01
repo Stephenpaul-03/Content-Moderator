@@ -41,14 +41,13 @@ function Post() {
   const handleLike = async (postId) => {
     try {
       await PostService.likePost(postId);
-      // Refresh posts or update the specific post's like count
-      fetchPosts();
+      fetchPosts(); // Refresh posts or update the specific post's like count
     } catch (err) {
       console.error('Failed to like post:', err);
     }
   };
 
-  // if (loading) return <Center><Spinner /></Center>;
+  if (loading) return <Center>Loading...</Center>;
   if (error) return <Text color="red.500">{error}</Text>;
 
   return (
@@ -75,16 +74,15 @@ function Post() {
           <CardBody>
             <Text>{post.description}</Text>
           </CardBody>
-          {post.images && post.images.length > 0 && (
-              <Image
-                px={2}
-                paddingBottom={2}
-                objectFit="cover"
-                src={post.images[0]} // This now contains a base64 string
-                alt="Post image"
-              />
-            )}          
-          
+          {post.image && (
+            <Image
+              px={2}
+              paddingBottom={2}
+              objectFit="cover"
+              src={post.image} // Use the base64 string from the backend
+              alt="Post image"
+            />
+          )}
           <CardFooter
             justify="space-between"
             flexWrap="wrap"
@@ -94,10 +92,10 @@ function Post() {
               },
             }}
           >
-            <Button 
-              flex="1" 
-              variant="ghost" 
-              leftIcon={<Heart/>}
+            <Button
+              flex="1"
+              variant="ghost"
+              leftIcon={<Heart />}
               onClick={() => handleLike(post.id)}
             >
               Like ({post.likes})
@@ -105,7 +103,7 @@ function Post() {
             <Button flex="1" variant="ghost" leftIcon={<Share2 />}>
               Share
             </Button>
-            <Button flex="1" variant="ghost" leftIcon={<Bookmark/>}>
+            <Button flex="1" variant="ghost" leftIcon={<Bookmark />}>
               Save
             </Button>
           </CardFooter>
@@ -116,4 +114,3 @@ function Post() {
 }
 
 export default Post;
-

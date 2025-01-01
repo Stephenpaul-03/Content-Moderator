@@ -100,22 +100,19 @@ const AuthService = {
 
 const PostService = {
   
-  createPost: async (postData) => {
+  createPost: async (formData) => {
     try {
-      // Send the data directly as JSON since we're using base64 string
-      const response = await api.post('/posts', postData, {
+      const response = await api.post('/posts', formData, {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'multipart/form-data',
         }
       });
-      
       return response.data;
     } catch (error) {
       console.error('Post creation error:', error);
       throw error.response?.data || error.message;
     }
-  },
-  
+  },  
   getFeed: async () => {
     try {
       const response = await api.get('/posts/feed');

@@ -13,7 +13,7 @@ function setupWebSocketServer(server) {
         const { type, data } = JSON.parse(message);
         
         if (type === 'MODERATE_CONTENT') {
-          const { description, image } = data;
+          const { text, image } = data;
           
           const pythonScriptPath = path.resolve(__dirname, 'moderator.py');
           console.log('Executing Python script at:', pythonScriptPath);
@@ -23,40 +23,48 @@ function setupWebSocketServer(server) {
           let outputData = '';
           let errorData = '';
 
+          // Debug logging
+          console.log('Sending to Python process:');
+          console.log('Text length:', text ? text.length : 0);
+          console.log('Image data length:', image ? image.length : 0);
+
           // Send data to Python process
           const inputData = JSON.stringify({
-            text: description,
-            image: image.path
-          });
+            text: text || '',
+            image: image || ''
+          }) + '\n';  // Add newline to ensure Python gets complete input
           
-          pythonProcess.stdin.write(inputData);
-          pythonProcess.stdin.end();
+          pythonProcess.stdin.write(inputData, (error) => {
+            if (error) {
+              console.error('Error writing to Python process:', error);
+              ws.send(JSON.stringify({
+                type: 'ERROR',
+                error: 'Failed to send data to moderation service'
+              }));
+              pythonProcess.kill();
+              return;
+            }
+            pythonProcess.stdin.end();
+          });
 
           pythonProcess.stdout.on('data', (data) => {
+            console.log('Python stdout:', data.toString());
             outputData += data.toString();
           });
 
           pythonProcess.stderr.on('data', (data) => {
+            console.log('Python stderr:', data.toString());
             errorData += data.toString();
-            console.error('Python stderr:', data.toString());
           });
 
           pythonProcess.on('close', (code) => {
             console.log(`Python process exited with code ${code}`);
             
             if (code !== 0) {
-              try {
-                const errorObj = JSON.parse(errorData);
-                ws.send(JSON.stringify({
-                  type: 'ERROR',
-                  error: errorObj.error || 'Moderation failed'
-                }));
-              } catch (e) {
-                ws.send(JSON.stringify({
-                  type: 'ERROR',
-                  error: `Moderation failed: ${errorData}`
-                }));
-              }
+              ws.send(JSON.stringify({
+                type: 'ERROR',
+                error: `Moderation failed: ${errorData}`
+              }));
               return;
             }
 
@@ -64,12 +72,10 @@ function setupWebSocketServer(server) {
               const result = JSON.parse(outputData);
               ws.send(JSON.stringify({
                 type: 'MODERATION_RESULT',
-                data: {
-                  textTag: result.textTag,
-                  imageTag: result.imageTag
-                }
+                data: result
               }));
             } catch (error) {
+              console.error('Failed to parse Python output:', error);
               ws.send(JSON.stringify({
                 type: 'ERROR',
                 error: 'Failed to parse moderation results'

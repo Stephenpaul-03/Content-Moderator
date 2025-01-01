@@ -48,6 +48,8 @@ function CreatePostModal({
   const toast = useToast();
   const wsRef = useRef(null);
   const fileInputRef = useRef(null);
+  const [title, setTitle] = useState('');
+
 
   const toggleCategories = (badge) => {
     setSelectedCategories((prev) =>
@@ -108,7 +110,7 @@ function CreatePostModal({
     };
   }, [toast]);
 
-  const moderateContent = async (description, imageBase64) => {
+  const moderateContent = async (description, imageFile) => {
     return new Promise((resolve, reject) => {
       if (!ws || ws.readyState !== WebSocket.OPEN) {
         reject(new Error("Moderation service is not connected"));
@@ -121,106 +123,140 @@ function CreatePostModal({
 
       ws.onmessage = (event) => {
         clearTimeout(timeoutId);
-        const response = JSON.parse(event.data);
-        
-        if (response.type === 'ERROR') {
-          reject(new Error(response.error));
-        } else if (response.type === 'MODERATION_RESULT') {
-          resolve(response.data);
+        try {
+          const response = JSON.parse(event.data);
+          console.log("WebSocket response:", response);
+          
+          if (response.type === 'ERROR') {
+            reject(new Error(response.error));
+          } else if (response.type === 'MODERATION_RESULT') {
+            resolve(response.data);
+          }
+        } catch (error) {
+          reject(new Error("Invalid response from moderation service"));
         }
       };
 
-      // Send only the base64 part without the data:image prefix
-      const base64Image = imageBase64.split(',')[1];
+      // Convert image file to base64
+      if (imageFile) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          try {
+            const base64Data = reader.result;
+            
+            // Validate base64 data
+            if (!base64Data || typeof base64Data !== 'string') {
+              reject(new Error("Invalid image data"));
+              return;
+            }
 
-      ws.send(JSON.stringify({
-        type: 'MODERATE_CONTENT',
-        data: {
-          text: description,
-          image: base64Image
-        }
-      }));
+            // Send the data through WebSocket
+            ws.send(JSON.stringify({
+              type: 'MODERATE_CONTENT',
+              data: {
+                text: description || '',
+                image: base64Data
+              }
+            }));
+          } catch (error) {
+            reject(new Error("Failed to process image"));
+          }
+        };
+
+        reader.onerror = () => {
+          reject(new Error("Failed to read image file"));
+        };
+
+        reader.readAsDataURL(imageFile);
+      } else {
+        reject(new Error("No image file provided"));
+      }
     });
   };
 
   const handleSubmit = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  try {
+    setIsLoading(true);
+    setError(null);
 
-      // Validate inputs
-      if (!ws || ws.readyState !== WebSocket.OPEN) {
-        throw new Error("Moderation service is not connected. Please try again.");
-      }
-
-      const description = document.getElementById("post-text").value;
-      if (!description.trim()) {
-        throw new Error("Please add some text to your post");
-      }
-
-      if (!preview) {
-        throw new Error("Please select an image for your post");
-      }
-
-      // Step 1: Moderate content
-      const moderationResult = await moderateContent(description, preview);
-      
-      if (!moderationResult || !moderationResult.textTag || !moderationResult.imageTag) {
-        throw new Error("Invalid moderation result received");
-      }
-
-      const { textTag, imageTag } = moderationResult;
-      
-      if (textTag !== 'OK' || imageTag !== 'OK') {
-        const contentType = textTag !== 'OK' ? 'Text' : 'Image';
-        const tag = textTag !== 'OK' ? textTag : imageTag;
-        throw new Error(`${contentType} contains inappropriate content (${tag}). Cannot post.`);
-      }
-
-      // Step 2: Create post with moderated content
-      const postData = {
-        title: selectedCategories.join(', '),
-        description: description,
-        location: localStorage.getItem('selectedLocation') || 'Default Location',
-        images: [preview]  // Send as array to match backend expectation
-      };
-
-      const createdPost = await PostService.createPost(postData);
-
-      toast({
-        title: "Success",
-        description: "Your post has been published successfully",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
-
-      // Reset form
-      setFile(null);
-      setPreview(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-      document.getElementById("post-text").value = '';
-      
-      onClose();
-      return createdPost;
-
-    } catch (err) {
-      console.error('Submit handler error:', err);
-      toast({
-        title: "Error",
-        description: err.message || "An unexpected error occurred",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
+    const description = document.getElementById("post-text").value;
+    
+    // Validate inputs
+    if (!title.trim()) {
+      throw new Error("Please enter a title for your post");
     }
-  };
 
+    if (!description.trim()) {
+      throw new Error("Please add some text to your post");
+    }
+
+    if (!file) {
+      throw new Error("Please select an image for your post");
+    }
+
+    // Step 1: Moderate content
+    const moderationResult = await moderateContent(description, file);
+    
+    if (!moderationResult || typeof moderationResult !== 'object') {
+      throw new Error("Invalid moderation result received");
+    }
+
+    const { textTag, imageTag } = moderationResult;
+    
+    if (textTag !== 'OK' || imageTag !== 'OK') {
+      const contentType = textTag !== 'OK' ? 'Text' : 'Image';
+      const tag = textTag !== 'OK' ? textTag : imageTag;
+      throw new Error(`${contentType} contains inappropriate content (${tag}). Cannot post.`);
+    }
+
+    // Step 2: Create FormData with only the required fields
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('image', file);
+    formData.append('description', description);
+    formData.append('location', 'default');  // Add default location
+
+    // Remove categories as it's not supported by the API
+    // formData.append('categories', JSON.stringify(selectedCategories));
+
+    // Step 3: Create the post
+    const response = await PostService.createPost(formData);
+    
+    toast({
+      title: "Success",
+      description: "Post created successfully!",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
+    
+    // Reset form
+    setTitle('');
+    document.getElementById("post-text").value = '';
+    setFile(null);
+    setPreview(null);
+    setSelectedCategories([]);
+    
+    onClose();
+    
+    if (typeof onPostCreated === 'function') {
+      onPostCreated(response);
+    }
+
+  } catch (err) {
+    console.error('Submit handler error:', err);
+    toast({
+      title: "Error",
+      description: err.message || "An unexpected error occurred",
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+    });
+    setError(err.message);
+  } finally {
+    setIsLoading(false);
+  }
+};  
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     if (selectedFile) {
@@ -281,6 +317,13 @@ function CreatePostModal({
                   justifyContent="space-between"
                   height="100%"
                 >
+                  <Input
+                    id="post-title"
+                    placeholder="Enter post title..."
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    mb={4}
+                  />
                   <Box
                     as="label"
                     htmlFor="post-file"

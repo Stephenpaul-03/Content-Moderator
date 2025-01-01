@@ -7,11 +7,12 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Center } from "@chakra-ui/react";
 
+
 const images = [
-  "https://via.placeholder.com/800x400?text=Image+1",
-  "https://via.placeholder.com/800x400?text=Image+2",
-  "https://via.placeholder.com/800x400?text=Image+3",
-  "https://via.placeholder.com/800x400?text=Image+4",
+  "https://www.w3schools.com/w3images/mountains.jpg",  // Mountain scenery
+  "https://www.w3schools.com/w3images/ocean.jpg",     // Ocean view
+  "https://www.w3schools.com/w3images/forest.jpg",    // Forest view
+  "https://www.w3schools.com/w3images/snow.jpg",      // Snowy landscape
 ];
 
 const ImageCarousel = () => {

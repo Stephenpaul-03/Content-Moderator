@@ -5,9 +5,14 @@ const { db } = require('../config/firebase.js');
 const { authenticateUser } = require('../middlewares/auth.js');
 const { validate } = require('../middlewares/validation.js');
 const { AppError } = require('../middlewares/errorHandler.js');
+
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 const fs = require('fs').promises;
+
+
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -31,24 +36,26 @@ router.get('/feed', authenticateUser, async (req, res, next) => {
 });
 
 // Create post
+
+
 router.post(
   '/',
   authenticateUser,
+  upload.single('image'),
   validate('createPost'),
   async (req, res, next) => {
     try {
-      const { title, description, location, images } = req.body;
+      const { title, description, location } = req.body;
       const userId = req.user.uid;
 
-      if (!images || !images.length) {
+      if (!req.file) {
         throw new AppError('Image is required', 400);
       }
 
-      // Validate base64 image
-      if (!images[0].startsWith('data:image/')) {
-        throw new AppError('Invalid image format', 400);
-      }
+      // Convert the image buffer to a base64 string
+      const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
 
+      // Prepare the post data
       const postData = {
         userId,
         title,
@@ -57,10 +64,11 @@ router.post(
         likes: 0,
         views: 0,
         location,
-        images, // Store the array of base64 strings
+        image: base64Image, // Save the base64 string
         commentCount: 0,
       };
 
+      // Add the post to the database
       const postRef = await db.collection('posts').add(postData);
 
       res.status(201).json({
@@ -68,15 +76,14 @@ router.post(
         postId: postRef.id,
         post: {
           id: postRef.id,
-          ...postData
-        }
+          ...postData,
+        },
       });
     } catch (error) {
       next(new AppError(error.message, 400));
     }
   }
 );
-
 // Get single post with comments
 router.get('/:postId', authenticateUser, async (req, res, next) => {
   try {
